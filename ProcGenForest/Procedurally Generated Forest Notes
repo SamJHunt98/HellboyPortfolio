@@ -1,1 +1,12 @@
-Notes On The ProcGen Tree System
+The main gameplay loop of Hellboy involves traversing through procedurally generated levels in four distinct biomes. One of these biomes is a corrupted forest area that stands out among the other biomes due to the tall trees looming over the player and the
+use of a large terrain as a foundation rather than simply being a collection of floating rooms and paths. While the area may look different from other biomes, the procedural generation method is identical in how it lays out the rooms except for an added step
+of carving these levels out from a base terrain rather than building them in the scene. This meant that when it came to populating the out of bounds areas with trees we found ourselves with some problems to solve.
+
+The Brief:
+  - Trees should be able to spawn close enough to the play area to seem natural. While the easiest option would be to create a set of bounds for the entire playable area and stop trees from spawning in it, this would lead to huge gaps around playable rooms where no trees spawned, which would break immersion.
+  - Forest should be dense enough to look imposing, but trees should not be able to clip into each other. This meant that we had to find a way to make sure trees didn't spawn with huge gaps between them, but also didn't spawn close enough to each other to clip.
+  - Trees cannot spawn on the playable area. This meant that we needed to know all the boundaries of each room and path in order to not allow any trees to spawn inside one.
+  - Cannot have a large impact on loading times. Procedurally generating levels with terrain already took much longer than levels without, so the tree spawning algorithm needed to be performant enough to avoid any major slowdowns, especially as the game would be released on the Nintendo Switch.
+
+In order to fit the brief I knew that I eneded to find a way to calculate as many positions that could contain a tree as possible, but due to the size of the terrains being used it would take millions of iterations to check every individual coordinate. As such I decided that the best option would be to turn the terrain into a grid.
+
