@@ -1,0 +1,39 @@
+/// <summary>
+	/// Currently there's no actual need for us to check whether the player has exited the room with the knife as there's no functionality to leaving a room.
+	/// Therefore we can just check for the player's raycast passing through the entrance trigger and then check whether the destination of the teleport
+	/// is closer to the entrance than the exit, in which case the player has teleported through the door
+	/// </summary>
+	/// <param name="ray"></param>
+	/// <param name="distance"></param>
+	/// <param name="destPos"></param>
+	public void TryPassRayThroughRoom(Ray ray, float distance, Vector3 destPos)
+	{
+		if (m_PlayerEntranceTrigger.gameObject.activeInHierarchy && m_PlayerExitTrigger.gameObject.activeInHierarchy)
+		{
+			float entranceDistance = 0;
+			Bounds entranceBounds = m_PlayerEntranceTrigger.GetColliderBounds();
+			if (entranceBounds.Contains(destPos))
+			{
+				//if the player is spawning inside of the trigger bounds then things should just work as normal since they will need to walk out of the trigger
+				return;
+			}
+			Bounds exitBounds = m_PlayerExitTrigger.GetColliderBounds();
+			bool throughEntrance = entranceBounds.IntersectRay(ray, out entranceDistance);
+#if DEVELOPMENT_BUILD || UNITY_EDITOR
+			if (DebugFlags.Instance.GetFlag("Utils/Targeting"))
+			{
+				UtilsDebug.DrawLine(ray.origin, ray.origin + (ray.direction * distance), Color.red, 20);
+			}
+#endif
+			if (throughEntrance && Mathf.Abs(entranceDistance) <= distance)
+			{
+				if (Vector3.Distance(entranceBounds.ClosestPoint(destPos), destPos) <
+					Vector3.Distance(exitBounds.ClosestPoint(destPos), destPos))
+				{
+					//need to switch this off just in case player is standing on the exit side when teleporting
+					m_PlayerIsInExitVolume = false;
+					OnPlayerExitedEntranceTrigger();
+				}
+			}
+		}
+	}
