@@ -1,1 +1,20 @@
 Notes for the blessing system:
+
+In Hellboy we wanted to add variety to runs by giving the player a series of temporary power-ups that they could find in the levels. We wanted to have two types of blessings to represent the two main forces
+the player encountered in the Wyrd. The first set of blessings were given by the Norns and gave the player passive modifiers ranging from basic stat increases to game-warping modifications such as replacing 
+money drops with health pickups. The second type of blessing was given by Scheherazade and gave the player an option of applying debuffs to enemies via either their fists, their gun or their charm. 
+
+For this system to work, the most important thing to figure out was going to be figuring out how to know when a player is able to apply a blessing to an enemy and what attacks are going to apply the status.
+The way I ended up doing this was by splitting every Scheherazade blessing into two status effects - one that is applied to the player when they accept the blessing, and one that they apply to the enemy via 
+that status effect. The status effect on the player has an OnDamageGiven function that subscribes to a delegate inside their DamageSource component which is called every time they deal damage to something.
+If the target has a StatusEffects component then they are a viable target for having a status applied, so I check whether they already have this status effect listed in their list of active status effects. 
+If they don't then I create one and add it to the list. Once they have an instance of the status effect applied I then increase the stack count of the effect based on the data of the source used.
+
+The system of adding the status effects is one that I definitely would have liked to refactor if the project was not under such strict time constraints. The OnTriggered and OnDamageGiven functions for these 
+statuses ended up being very boilerplate heavy due to needing to create a different status effect in each of the OnTriggered functions. If I was able to go back and work on the system again I would make 
+OnTriggered a generic function with a templated StatusEffectType variable that I could feed into a static function that would return the correct status effect to apply. This would allow the function to exist 
+in the base class without needing to be overridden for every single status. Similarly I would move OnDamageGiven's functionality to the base class as the code seems to be the same in every instance. 
+
+While the code for this system ended up being quite messy due to some late additions in the form of the post-game modifiers I am quite satisfied with the status effect system as it managed to have a quick 
+turnaround time for prototyping new functionality, which was essential for such a small team with limited time. The status effects also managed to support two of our late-development additions (post-game modifiers
+and enemy corruption modifiers) with very little effort, which allowed us to get a lot of content made very quickly and without any major bugs.
