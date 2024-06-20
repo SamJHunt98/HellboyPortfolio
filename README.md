@@ -7,3 +7,5 @@ This repository will serve as a library for some of my favourite systems that I 
   - My thought processes behind the systems
   - Any limitations that needed to be worked around
   - How the systems morphed as the project grew
+
+Some of the .cs files have had their formatting changed by being uploaded to this repository - if something looks strange then downloading it and viewing in Visual Studio will show how it looked during development.
